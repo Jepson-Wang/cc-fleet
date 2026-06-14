@@ -51,15 +51,18 @@ if ($VERSION -and ($VERSION -notlike 'v*')) { $VERSION = "v$VERSION" }
 
 if (-not $VERSION -and -not $env:CCF_BASE_URL) {
     # Read the tag from the /releases/latest redirect — no JSON parsing needed.
-    # A 3xx with -MaximumRedirection 0 throws, so the Location usually arrives on
-    # the exception's response: a WebException carries a header collection (5.1),
-    # an HttpResponseException a typed Location property (7+).
+    # -MaximumRedirection 0 stops at the 3xx and returns the response carrying the
+    # Location header; 5.1 also emits a non-terminating error we suppress with
+    # -ErrorAction so the script's 'Stop' preference can't abort the call. Should
+    # only an exception carry the response, read .Response defensively: its shape
+    # varies across editions and an unguarded read throws under StrictMode (#54).
     $loc = $null
     try {
-        $resp = Invoke-WebRequest -Uri "https://github.com/$REPO/releases/latest" -MaximumRedirection 0 -UseBasicParsing
-        $loc = $resp.Headers['Location']
+        $resp = Invoke-WebRequest -Uri "https://github.com/$REPO/releases/latest" -MaximumRedirection 0 -UseBasicParsing -ErrorAction SilentlyContinue
+        if ($resp) { $loc = $resp.Headers['Location'] }
     } catch {
-        $r = $_.Exception.Response
+        $r = $null
+        if ($_.Exception.PSObject.Properties['Response']) { $r = $_.Exception.Response }
         if ($r -is [System.Net.HttpWebResponse]) {
             $loc = $r.Headers['Location']
         } elseif ($r) {
