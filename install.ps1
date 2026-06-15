@@ -144,7 +144,7 @@ if (Get-Command claude -ErrorAction SilentlyContinue) {
         Write-Host "    claude plugin install $PLUGIN@$MARKETPLACE --scope $SCOPE"
     }
 } else {
-    Write-Host "==> 'claude' not on PATH — skipped plugin install. To add the skill later:"
+    Write-Host "==> 'claude' not on PATH - skipped plugin install. To add the skill later:"
     Write-Host "    claude plugin marketplace add $REPO --scope $SCOPE"
     Write-Host "    claude plugin install $PLUGIN@$MARKETPLACE --scope $SCOPE"
 }
@@ -154,7 +154,7 @@ if (Get-Command claude -ErrorAction SilentlyContinue) {
 if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
     Write-Host ""
     Write-Host "==> Note: Claude Code ('claude') was not found on PATH."
-    Write-Host "    cc-fleet drives Claude Code — install it to run subagents / workflows:"
+    Write-Host "    cc-fleet drives Claude Code - install it to run subagents / workflows:"
     Write-Host "    https://docs.anthropic.com/claude-code"
 }
 
@@ -179,7 +179,7 @@ if ($onPath) {
 Write-Host ""
 Write-Host "==> Next steps"
 Write-Host ""
-Write-Host "   cc-fleet             # launch the interactive TUI — register a provider and get started"
+Write-Host "   cc-fleet             # launch the interactive TUI - register a provider and get started"
 Write-Host "                        #   (config is auto-created on first save; no init needed)"
 Write-Host "   cc-fleet doctor      # optional: run the health checks"
 Write-Host ""
