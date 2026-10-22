@@ -4,7 +4,6 @@ package codexproxy
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
 
@@ -42,7 +41,8 @@ func profileTargetsPort(argv []string, port int) bool {
 	if json.Unmarshal(b, &prof) != nil {
 		return false
 	}
-	return strings.Contains(prof.Env["ANTHROPIC_BASE_URL"], fmt.Sprintf(":%d", port))
+	p, err := PortFromBaseURL(prof.Env["ANTHROPIC_BASE_URL"])
+	return err == nil && p == port
 }
 
 func settingsPath(argv []string) string {
