@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"sync"
 
 	"github.com/ethanhq/cc-fleet/internal/ccver"
@@ -60,6 +61,10 @@ func (codexEngine) Resolve() (string, string, error) {
 	p, err := exec.LookPath("codex")
 	if err != nil {
 		return "", "", fmt.Errorf("%w: %v", errCodexNotFound, err)
+	}
+	// LookPath can return a relative path under GODEBUG=execerrdot=0.
+	if abs, absErr := filepath.Abs(p); absErr == nil {
+		p = abs
 	}
 	if !ccver.IsExecutable(p) {
 		return "", "", fmt.Errorf("%w: %s is not a runnable file", errCodexNotFound, p)

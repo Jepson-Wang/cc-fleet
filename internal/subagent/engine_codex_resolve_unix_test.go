@@ -90,6 +90,29 @@ func TestCodexResolveUnknownVersion(t *testing.T) {
 	}
 }
 
+// TestCodexResolveRelativePath: a relative PATH hit is rejected by default
+// (ErrDot) but accepted under GODEBUG=execerrdot=0, where Resolve must
+// absolutize it so cmd.Dir and the version cache key stay cwd-independent.
+func TestCodexResolveRelativePath(t *testing.T) {
+	root := t.TempDir()
+	fakeCodex(t, filepath.Join(root, "tools", "bin", "codex"), "codex-cli 0.163.0")
+	t.Chdir(root)
+	t.Setenv("PATH", filepath.Join("tools", "bin"))
+	if _, _, err := (codexEngine{}).Resolve(); !errors.Is(err, errCodexNotFound) {
+		t.Fatalf("relative PATH hit: err = %v, want errCodexNotFound", err)
+	}
+
+	t.Setenv("GODEBUG", "execerrdot=0")
+	want, err := filepath.Abs(filepath.Join("tools", "bin", "codex"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	path, ver, err := codexEngine{}.Resolve()
+	if err != nil || path != want || ver != "0.163.0" || !filepath.IsAbs(path) {
+		t.Fatalf("Resolve = (%q, %q, %v), want (%q, 0.163.0, nil)", path, ver, err, want)
+	}
+}
+
 // TestCodexResolveNotFound: no codex on PATH, or a 0-byte one LookPath still
 // accepts, both fail with errCodexNotFound.
 func TestCodexResolveNotFound(t *testing.T) {
