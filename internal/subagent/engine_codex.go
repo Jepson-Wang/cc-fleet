@@ -2,7 +2,11 @@ package subagent
 
 import (
 	"errors"
+	"fmt"
+	"os/exec"
+	"sync"
 
+	"github.com/ethanhq/cc-fleet/internal/ccver"
 	"github.com/ethanhq/cc-fleet/internal/config"
 	"github.com/ethanhq/cc-fleet/internal/diag"
 )
@@ -38,7 +42,34 @@ func (unimplementedEngine) Classify(s launchSpec, _, _ []byte, _ int, _ bool) Re
 	return fail(ErrCodeFailed, errEngineUnimplemented.Error(), s.req.Provider, "")
 }
 
-// codexEngine will run workers on the Codex CLI; it writes no methods yet.
+var errCodexNotFound = errors.New("codex binary not found")
+
+// codexVersions caches path → version once per path per process: a workflow
+// resolves per leaf, and `codex --version` boots node on an npm install.
+var codexVersions sync.Map
+
+// codexEngine will run workers on the Codex CLI; so far it writes only Resolve.
 type codexEngine struct{ unimplementedEngine }
 
 var _ Engine = codexEngine{}
+
+// Resolve finds codex on PATH (codex has no per-version layout). The version is
+// "" when unknown, not an error, and an unknown one is not cached: a cold node
+// start can time out once.
+func (codexEngine) Resolve() (string, string, error) {
+	p, err := exec.LookPath("codex")
+	if err != nil {
+		return "", "", fmt.Errorf("%w: %v", errCodexNotFound, err)
+	}
+	if !ccver.IsExecutable(p) {
+		return "", "", fmt.Errorf("%w: %s is not a runnable file", errCodexNotFound, p)
+	}
+	if v, ok := codexVersions.Load(p); ok {
+		return p, v.(string), nil
+	}
+	v := ccver.VersionForPath(p)
+	if v != "" {
+		codexVersions.Store(p, v)
+	}
+	return p, v, nil
+}

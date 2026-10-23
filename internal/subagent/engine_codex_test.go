@@ -7,15 +7,12 @@ import (
 	"github.com/ethanhq/cc-fleet/internal/config"
 )
 
-// codexEngine writes no methods yet: through the embedded default, every call
-// that can fail returns a classified failure and none panics.
+// Beyond Resolve, codexEngine runs on the embedded default: every call that can
+// fail returns a classified failure and none panics.
 func TestCodexEngineSkeletonFailsClassified(t *testing.T) {
 	var eng Engine = codexEngine{}
 	spec := launchSpec{req: Request{Provider: "cx", PromptProfile: ProfileSlim}}
 
-	if _, _, err := eng.Resolve(); !errors.Is(err, errEngineUnimplemented) {
-		t.Errorf("Resolve err = %v, want errEngineUnimplemented", err)
-	}
 	if eff, dn := eng.GateProfile(ProfileSlim, "1.0.0"); eff != ProfileSlim || dn != "" {
 		t.Errorf("GateProfile = (%q, %q), want the request back unchanged", eff, dn)
 	}
