@@ -19,8 +19,6 @@
   }
 }
 == raw
-{"type":"system","subtype":"init","session_id":"84c5b474-aaaa"}
-{"type":"assistant","message":{"content":[{"type":"text","text":"working"},{"type":"tool_use","name":"Read","input":{"file_path":"/src/main.go"}}],"usage":{"input_tokens":10,"output_tokens":2}}}
 {"type":"result","subtype":"success","is_error":false,"api_error_status":null,"duration_ms":3654,"duration_api_ms":3385,"ttft_ms":3397,"num_turns":1,"stop_reason":"end_turn","session_id":"84c5b474-aaaa","total_cost_usd":0.258409,"usage":{"input_tokens":50750,"cache_read_input_tokens":18,"output_tokens":186,"service_tier":"standard"},"modelUsage":{"mimo-v2-flash":{"inputTokens":50750,"outputTokens":186,"costUSD":0.258409}},"result":"SUBAGENT_SMOKE_OK=42","permission_denials":[],"terminal_reason":"completed"}
 == exit_code
 0
