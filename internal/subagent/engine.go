@@ -10,7 +10,9 @@ type launchSpec struct {
 	req      Request
 	provider *config.Provider // nil for the native leaf
 	bin      string           // Resolve's path
-	settings string           // Prepare's output; "" for the native leaf
+	// settings is Prepare's output: claude's profile path or codex's CODEX_HOME;
+	// "" for the native leaf. A background job also binds its pid to it.
+	settings string
 	model    string
 	effort   string
 	profile  string // effective prompt profile (GateProfile's output)
